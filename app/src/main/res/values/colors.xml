@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand Colors -->
+    <color name="primary">#1A2E4A</color>
+    <color name="primary_dark">#0F1E33</color>
+    <color name="primary_light">#243D5E</color>
+    <color name="accent">#4ECDC4</color>
+    <color name="accent_dark">#38B2AA</color>
+    <color name="accent_light">#7EDDD6</color>
+
+    <!-- Surface Colors -->
+    <color name="surface">#1E3A5F</color>
+    <color name="surface_variant">#243D5E</color>
+    <color name="card_background">#1E3A5F</color>
+    <color name="background">#0F1E33</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B0C4DE</color>
+    <color name="text_hint">#6B8CAE</color>
+
+    <!-- Status Colors -->
+    <color name="expense_red">#FF6B6B</color>
+    <color name="income_green">#4CAF84</color>
+    <color name="warning_yellow">#FFD700</color>
+
+    <!-- Navigation -->
+    <color name="nav_background">#1A2E4A</color>
+    <color name="nav_selected">#4ECDC4</color>
+    <color name="nav_unselected">#6B8CAE</color>
+
+    <!-- FAB -->
+    <color name="fab_color">#4ECDC4</color>
+
+    <!-- Misc -->
+    <color name="divider">#2A3F5E</color>
+    <color name="ripple">#334D7A</color>
+    <color name="white">#FFFFFF</color>
+    <color name="transparent">#00000000</color>
+</resources>

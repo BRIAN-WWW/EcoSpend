@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">EcoSpend</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_transactions">Transactions</string>
+    <string name="nav_summary">Summary</string>
+    <string name="nav_currency">Currency</string>
+    <string name="nav_profile">Profile</string>
+    <string name="add_transaction">Add Transaction</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="no_transactions">No transactions yet.\nTap + to add your first one!</string>
+    <string name="analyze_spending">Analyze My Spending</string>
+    <string name="ai_advisor">AI Financial Advisor</string>
+    <string name="tagline">Smart spending, greener future</string>
+    <string name="total_balance">Total Balance</string>
+    <string name="total_expense">This Month</string>
+    <string name="recent_transactions">Recent Transactions</string>
+</resources>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Outer leaf shape -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:pathData="M54,18 C54,18 30,28 26,50 C22,72 38,86 54,90 C70,86 86,72 82,50 C78,28 54,18 54,18 Z" />
+
+    <!-- Inner highlight -->
+    <path
+        android:fillColor="#7EDDD6"
+        android:alpha="0.5"
+        android:pathData="M54,24 C54,24 36,32 33,50 C30,64 40,76 54,80 C54,80 48,68 48,54 C48,40 54,24 54,24 Z" />
+
+    <!-- Coin circle -->
+    <path
+        android:fillColor="#1A2E4A"
+        android:pathData="M54,42 m-14,0 a14,14 0 1,0 28,0 a14,14 0 1,0 -28,0" />
+
+    <!-- Dollar sign -->
+    <path
+        android:fillColor="#4ECDC4"
+        android:strokeWidth="1.5"
+        android:pathData="M54,36 L54,38.5 M54,45.5 L54,48 M49.5,39.5 C49.5,38.1 51.6,37 54,37 C56.4,37 58.5,38.1 58.5,39.5 C58.5,40.9 56.4,42 54,42 C51.6,42 49.5,43.1 49.5,44.5 C49.5,45.9 51.6,47 54,47 C56.4,47 58.5,45.9 58.5,44.5" />
+
+    <!-- Leaf stem -->
+    <path
+        android:fillColor="#1A2E4A"
+        android:pathData="M54,80 C54,80 54,72 54,68 L52,62 L56,62 L54,68" />
+
+</vector>
