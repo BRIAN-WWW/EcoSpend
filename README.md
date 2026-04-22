@@ -1,5 +1,5 @@
 # EcoSpend
-EcoSpend is a secure Android personal finance app that helps you manage money, track spending, and make smarter financial decisions.
+EcoSpend is a secure Android expense tracking app that helps you manage money, track spending, and make smarter financial decisions.
 
 ## 📱Features
 
