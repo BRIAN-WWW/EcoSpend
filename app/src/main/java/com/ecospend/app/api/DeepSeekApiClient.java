@@ -19,8 +19,8 @@ import okhttp3.Response;
 public class DeepSeekApiClient {
 
     private static final String TAG = "DeepSeekApiClient";
-    private static final String API_URL = "https://api.deepseek.com/chat/completions";
-    private static final String MODEL = "deepseek-chat";
+    private static final String API_URL = "https://openrouter.ai/api/v1/chat/completions";
+    private static final String MODEL = "openrouter/free";
     // API key should be set by user in settings; using placeholder
     private String apiKey;
 
@@ -44,8 +44,10 @@ public class DeepSeekApiClient {
     }
 
     public void analyzeSpending(String spendingContext, AiCallback callback) {
-        if (apiKey == null || apiKey.isEmpty() || apiKey.equals("YOUR_DEEPSEEK_API_KEY")) {
-            callback.onError("Please set your DeepSeek API key in Profile > Settings to use AI features.");
+        if (apiKey == null || apiKey.isEmpty()
+                || apiKey.equals("YOUR_DEEPSEEK_API_KEY")
+                || (!apiKey.startsWith("sk-or-") && !apiKey.startsWith("sk-"))) {
+            callback.onError("Please enter a valid OpenRouter API key (starts with sk-or-...) in Profile > Settings.");
             return;
         }
 
@@ -82,19 +84,36 @@ public class DeepSeekApiClient {
                         .url(API_URL)
                         .addHeader("Authorization", "Bearer " + apiKey)
                         .addHeader("Content-Type", "application/json")
+                        .addHeader("X-Title", "EcoSpend")
                         .post(requestBody)
                         .build();
 
                 try (Response response = client.newCall(request).execute()) {
                     if (response.isSuccessful() && response.body() != null) {
                         String responseStr = response.body().string();
+                        Log.d(TAG, "Raw response: " + responseStr); // helpful for debugging
                         JSONObject json = new JSONObject(responseStr);
-                        String content = json
+                        JSONObject message = json
                                 .getJSONArray("choices")
                                 .getJSONObject(0)
-                                .getJSONObject("message")
-                                .getString("content");
-                        mainHandler.post(() -> callback.onSuccess(content));
+                                .getJSONObject("message");
+
+                        // Some free models (e.g. R1) return reasoning_content
+                        // and set content to null — fall back gracefully
+                        String content = null;
+                        if (!message.isNull("content")) {
+                            content = message.getString("content");
+                        }
+                        if ((content == null || content.trim().isEmpty())
+                                && !message.isNull("reasoning_content")) {
+                            content = message.getString("reasoning_content");
+                        }
+                        if (content == null || content.trim().isEmpty()) {
+                            content = "No response received. Try again.";
+                        }
+
+                        final String finalContent = content;
+                        mainHandler.post(() -> callback.onSuccess(finalContent));
                     } else {
                         String errBody = response.body() != null ? response.body().string() : "Unknown error";
                         Log.e(TAG, "API error: " + response.code() + " " + errBody);
