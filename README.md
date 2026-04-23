@@ -17,7 +17,7 @@ EcoSpend is a secure Android expense tracking app that helps you manage money, t
 
 - **Search & Filtering**
   - Quickly locate transactions
-  - Filter by category, date, or amount
+  - Filter by category
 
 - **Privacy-First Storage**
   - Local data storage only
