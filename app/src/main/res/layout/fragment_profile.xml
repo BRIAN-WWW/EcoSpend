@@ -185,7 +185,7 @@
                     style="@style/EcoSpend.TextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="DeepSeek API Key"
+                    android:hint="OpenRouter API Key (sk-or-v1-...)"
                     android:layout_marginBottom="12dp"
                     app:endIconMode="password_toggle">
                     <com.google.android.material.textfield.TextInputEditText
