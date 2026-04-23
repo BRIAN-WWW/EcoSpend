@@ -27,11 +27,11 @@ EcoSpend is a secure Android expense tracking app that helps you manage money, t
 ## 🛠️Tech Stack
 
 - **Platform:** Android 
-- **Language:** Kotlin / Java
+- **Language:** Java
 - **APIs:**  
   - DeepSeek API (AI insights)  
   - Currency Exchange API  
-- **Database:** Local storage (e.g., SQLite / Room)
+- **Database:** Local storage (Room)
 
 ## 🚀 Getting Started
 
