@@ -4,7 +4,6 @@ import android.app.DatePickerDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -63,13 +62,13 @@ public class AddEditExpenseActivity extends AppCompatActivity {
         btnSave = findViewById(R.id.btn_save_transaction);
 
         repository = new TransactionRepository(getApplication());
-        currencyClient = new CurrencyApiClient();
+        // Pass Context to API Client
+        currencyClient = new CurrencyApiClient(this);
 
         setupSpinners();
         setupDatePicker();
         setupTypeToggle();
 
-        // Check if edit mode
         editTransactionId = getIntent().getIntExtra("transaction_id", -1);
         if (editTransactionId != -1) {
             isEditMode = true;
@@ -84,7 +83,6 @@ public class AddEditExpenseActivity extends AppCompatActivity {
     }
 
     private void setupSpinners() {
-        // Type defaults to expense
         updateCategorySpinner(Constants.TYPE_EXPENSE);
 
         ArrayAdapter<String> currencyAdapter = new ArrayAdapter<>(this,
@@ -92,7 +90,6 @@ public class AddEditExpenseActivity extends AppCompatActivity {
         currencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCurrency.setAdapter(currencyAdapter);
 
-        // Set default from prefs
         SharedPreferences prefs = getSharedPreferences(Constants.PREFS_NAME, 0);
         String defCurrency = prefs.getString(Constants.PREF_BASE_CURRENCY, "MYR");
         for (int i = 0; i < Constants.CURRENCIES.length; i++) {
@@ -151,7 +148,6 @@ public class AddEditExpenseActivity extends AppCompatActivity {
                 rgType.check(isExpense ? R.id.rb_expense : R.id.rb_income);
                 updateCategorySpinner(transaction.getType());
 
-                // Set category spinner
                 String[] cats = isExpense ? Constants.EXPENSE_CATEGORIES : Constants.INCOME_CATEGORIES;
                 for (int i = 0; i < cats.length; i++) {
                     if (cats[i].equals(transaction.getCategory())) {
@@ -160,7 +156,6 @@ public class AddEditExpenseActivity extends AppCompatActivity {
                     }
                 }
 
-                // Set currency spinner
                 for (int i = 0; i < Constants.CURRENCIES.length; i++) {
                     if (Constants.CURRENCIES[i].equals(transaction.getCurrency())) {
                         spinnerCurrency.setSelection(i);
@@ -193,50 +188,46 @@ public class AddEditExpenseActivity extends AppCompatActivity {
         String type = rgType.getCheckedRadioButtonId() == R.id.rb_expense
                 ? Constants.TYPE_EXPENSE : Constants.TYPE_INCOME;
 
+        SharedPreferences prefs = getSharedPreferences(Constants.PREFS_NAME, 0);
+        String baseCurrency = prefs.getString(Constants.PREF_BASE_CURRENCY, "MYR");
+
         btnSave.setEnabled(false);
         btnSave.setText("Saving...");
 
-        currencyClient.convertToMYR(amount, currency, new CurrencyApiClient.ConvertCallback() {
+        currencyClient.convert(amount, currency, baseCurrency, new CurrencyApiClient.ConvertCallback() {
             @Override
-            public void onSuccess(double convertedAmount, double rate) {
-                Transaction t = new Transaction(title, amount, category, type,
-                        currency, notes, selectedDate, convertedAmount);
-
-                if (isEditMode) {
-                    t.setId(editTransactionId);
-                    repository.update(t);
-                    runOnUiThread(() -> {
-                        Toast.makeText(AddEditExpenseActivity.this, "Updated!", Toast.LENGTH_SHORT).show();
-                        finish();
-                        overridePendingTransition(android.R.anim.fade_in, R.anim.slide_down);
-                    });
-                } else {
-                    repository.insert(t, id -> runOnUiThread(() -> {
-                        Toast.makeText(AddEditExpenseActivity.this, "Saved!", Toast.LENGTH_SHORT).show();
-                        finish();
-                        overridePendingTransition(android.R.anim.fade_in, R.anim.slide_down);
-                    }));
-                }
+            public void onSuccess(double convertedAmount, double rate, boolean isOffline) {
+                completeSave(title, amount, category, type, currency, notes, selectedDate, convertedAmount, isOffline, false);
             }
 
             @Override
             public void onError(String error) {
-                // Save with amount as MYR equivalent if API fails
-                Transaction t = new Transaction(title, amount, category, type,
-                        currency, notes, selectedDate, amount);
-                if (isEditMode) {
-                    t.setId(editTransactionId);
-                    repository.update(t);
-                } else {
-                    repository.insert(t, id -> {});
-                }
-                runOnUiThread(() -> {
-                    Toast.makeText(AddEditExpenseActivity.this,
-                            "Saved (offline mode - rate not converted)", Toast.LENGTH_SHORT).show();
-                    finish();
-                    overridePendingTransition(android.R.anim.fade_in, R.anim.slide_down);
-                });
+                // If there's literally no cache at all, fallback to 1:1 original amount
+                completeSave(title, amount, category, type, currency, notes, selectedDate, amount, true, true);
             }
+        });
+    }
+
+    private void completeSave(String title, double amount, String category, String type,
+                              String currency, String notes, long date, double converted, boolean isOffline, boolean isHardError) {
+        Transaction t = new Transaction(title, amount, category, type,
+                currency, notes, date, converted);
+
+        if (isEditMode) {
+            t.setId(editTransactionId);
+            repository.update(t);
+        } else {
+            repository.insert(t, id -> {});
+        }
+
+        runOnUiThread(() -> {
+            String message = "Saved!";
+            if (isHardError) message = "Saved (Warning: No offline rates found. Used 1:1 conversion)";
+            else if (isOffline) message = "Saved using last known rates (Offline)";
+
+            Toast.makeText(AddEditExpenseActivity.this, message, Toast.LENGTH_SHORT).show();
+            finish();
+            overridePendingTransition(android.R.anim.fade_in, R.anim.slide_down);
         });
     }
 

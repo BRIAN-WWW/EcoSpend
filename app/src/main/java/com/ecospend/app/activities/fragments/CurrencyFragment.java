@@ -1,5 +1,6 @@
 package com.ecospend.app.activities.fragments;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -25,6 +26,7 @@ import com.ecospend.app.R;
 import com.ecospend.app.api.CurrencyApiClient;
 import com.ecospend.app.utils.Constants;
 import com.ecospend.app.utils.CurrencyFormatter;
+import com.ecospend.app.utils.DateUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +68,8 @@ public class CurrencyFragment extends Fragment {
         progressBar = view.findViewById(R.id.progress_currency);
         rvRates = view.findViewById(R.id.rv_rates);
 
-        apiClient = new CurrencyApiClient();
+        // API Client now requires Context
+        apiClient = new CurrencyApiClient(requireContext());
 
         setupSpinners();
         setupSwapButton();
@@ -82,7 +85,6 @@ public class CurrencyFragment extends Fragment {
         spinnerFrom.setAdapter(adapter);
         spinnerTo.setAdapter(adapter);
 
-        // Default: MYR → USD
         spinnerFrom.setSelection(0);
         spinnerTo.setSelection(1);
 
@@ -134,11 +136,19 @@ public class CurrencyFragment extends Fragment {
 
         apiClient.getRates(fromCurrency, new CurrencyApiClient.RatesCallback() {
             @Override
-            public void onSuccess(Map<String, Double> rates, String base) {
+            public void onSuccess(Map<String, Double> rates, String base, boolean isOffline, long lastSyncTimestamp) {
                 if (!isAdded()) return;
                 cachedRates = rates;
                 progressBar.setVisibility(View.GONE);
-                tvLastUpdated.setText("Rates updated just now");
+
+                if (isOffline) {
+                    tvLastUpdated.setText("Offline: Using cross-rates from " + DateUtils.formatDate(lastSyncTimestamp));
+                    tvLastUpdated.setTextColor(Color.RED);
+                } else {
+                    tvLastUpdated.setText("Rates updated just now");
+                    tvLastUpdated.setTextColor(getResources().getColor(android.R.color.darker_gray, null));
+                }
+
                 performConversion();
                 updateRatesList(rates);
             }
@@ -147,9 +157,10 @@ public class CurrencyFragment extends Fragment {
             public void onError(String error) {
                 if (!isAdded()) return;
                 progressBar.setVisibility(View.GONE);
-                tvResult.setText("Error fetching rates");
-                tvLastUpdated.setText("Could not load rates. Check your internet connection.");
-                Toast.makeText(getContext(), "Currency API error: " + error, Toast.LENGTH_SHORT).show();
+                tvResult.setText("Error");
+                tvLastUpdated.setText("No internet and no offline data available.");
+                tvLastUpdated.setTextColor(Color.RED);
+                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -177,7 +188,6 @@ public class CurrencyFragment extends Fragment {
     }
 
     private void updateRatesList(Map<String, Double> rates) {
-        // Show popular rates relative to fromCurrency
         List<RateItem> items = new ArrayList<>();
         String[] popular = {"USD", "EUR", "GBP", "SGD", "JPY", "CNY", "AUD"};
         for (String cur : popular) {
@@ -191,7 +201,6 @@ public class CurrencyFragment extends Fragment {
         rvRates.setAdapter(ratesAdapter);
     }
 
-    // Inner classes for rates list
     public static class RateItem {
         public String currency;
         public double rate;
