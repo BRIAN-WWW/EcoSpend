@@ -176,7 +176,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Powered by DeepSeek AI. Enter your API key to get personalised spending insights."
+                    android:text="Powered by OpenRouter AI. Enter your API key to get personalised spending insights."
                     android:textColor="@color/text_secondary"
                     android:textSize="12sp"
                     android:layout_marginBottom="12dp" />
